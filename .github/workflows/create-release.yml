@@ -104,7 +104,7 @@ jobs:
       stack_files_changed: ${{ steps.compare.outputs.stack_files_changed }}
     steps:
     - name: Checkout With History
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0  # gets full history
 
@@ -140,7 +140,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Create stack
       id: create-stack
@@ -158,25 +158,25 @@ jobs:
         echo "run_receipt=${{ env.RUN_RECEIPT_FILENAME }}" >> "$GITHUB_OUTPUT"
 
     - name: Upload run image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: current-run-image
         path: build/run.oci
 
     - name: Upload build image
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: current-build-image
         path: build/build.oci
 
     - name: Upload Build receipt
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: current-build-receipt
         path: ${{ steps.receipts.outputs.build_receipt }}
 
     - name: Upload Run receipt
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: current-run-receipt
         path: ${{ steps.receipts.outputs.run_receipt }}
@@ -195,12 +195,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - name: Download Build Receipt
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-build-receipt
 
     - name: Download Run Receipt
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-run-receipt
 
@@ -346,26 +346,27 @@ jobs:
     needs: [ create_stack ]
     runs-on: ubuntu-22.04
     steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
     - name: Setup Go
-      uses: actions/setup-go@v3
+      uses: actions/setup-go@v5
       with:
         go-version: 'stable'
 
-    - name: Checkout
-      uses: actions/checkout@v3
 
     - name: Create OCI artifacts destination directory
       run: |
         mkdir -p build
 
     - name: Download Build Image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-build-image
         path: build
 
     - name: Download Run Image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-run-image
         path: build
@@ -398,27 +399,27 @@ jobs:
         printf "Force Release: %s\n" "${{ github.event.inputs.force }}"
 
     - name: Checkout With History
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0  # gets full history
 
     - name: Download current build image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-build-image
 
     - name: Download current run image
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-run-image
 
     - name: Download Build Receipt
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-build-receipt
 
     - name: Download Run Receipt
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: current-run-receipt
 
