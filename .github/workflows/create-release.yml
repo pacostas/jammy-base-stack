@@ -316,11 +316,17 @@ jobs:
     - name: Write USNs File
       id: write_usns
       run: |
-        jq . <<< "${USNS}" > "${USNS_PATH}"
-        echo "usns=${USNS_PATH}" >> "$GITHUB_OUTPUT"
+        jq . <<< "${USNS}" > "./${USNS_PATH}"
+        echo "usns=./${USNS_PATH}" >> "$GITHUB_OUTPUT"
       env:
         USNS_PATH: "${{ matrix.arch }}-${{ matrix.stacks.name }}-${{ env.PATCHED_USNS_FILENAME }}"
         USNS: ${{ steps.usns.outputs.usns }}
+
+    # TODO remove below debug
+    - name: tree
+      run: |
+        tree .
+        ls 
 
     - name: Upload USNs file
       uses: actions/upload-artifact@v4
@@ -772,7 +778,10 @@ jobs:
 
     # TODO debug code Remove
     - name: Tree
-      run: tree .
+      run: |
+        tree .
+        echo "***********"
+        ls -R .
     
     - name: Get USNs
       id: get-usns
