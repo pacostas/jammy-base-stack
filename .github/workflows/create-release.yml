@@ -244,6 +244,11 @@ jobs:
         tree .
         echo "----------"
         echo "**************"
+        tree "${{ github.workspace }}"
+        echo "eeeeeeeeeeee"
+        cat  "${{ github.workspace }}/${{ matrix.arch }}-previous-build-receipt-${{ matrix.stacks.name }}"
+        cat "${{ github.workspace }}/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}"
+
 
     - name: Get Package List
       id: packages
