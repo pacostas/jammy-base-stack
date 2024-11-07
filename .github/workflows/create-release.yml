@@ -174,22 +174,6 @@ jobs:
           platforms_added=$(echo -n "{\"current_platforms\":${platforms},\"previous_platforms\":${previous_platforms}}" | jq -c '.current_platforms - .previous_platforms')
           echo "platforms_added=${platforms_added}"  >> "$GITHUB_OUTPUT"
 
-  # hello_test:
-  #   name: hello test
-  #   runs-on: ubuntu-22.04
-  #   needs: [ preparation ]
-  #   strategy:
-  #     matrix:
-  #       stacks: ${{ fromJSON(needs.preparation.outputs.stacks) }}
-  #       arch: ${{ fromJSON(needs.preparation.outputs.architectures) }}
-  #       exclude:
-  #         - arch:  "s390x"
-  #   steps:
-  #   - name: echo
-  #     id: echo
-  #     run: |
-  #       echo ${{ matrix.arch }} ${{ matrix.stacks.name }}
-
   # The following job is specific to Ubuntu images. It checks for new
   # USNs (Ubuntu Security Notices) and triggers the flow to create
   # a new release with the latest images that have the USNs patched.
@@ -615,7 +599,7 @@ jobs:
     - name: Check if the stack is newly added
       id: stack_is_new
       run: |
-        stack="${{ matrix.stack.name }}"
+        stack="${{ matrix.stacks.name }}"
         added_found=$(echo '${{ needs.preparation.outputs.stack_added }}' | jq --arg stack "$stack" 'index($stack)')
 
         if [ "$added_found" == "null" ]; then
@@ -774,7 +758,8 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         path: "patched-usns"
-        pattern: "*-${{ env.PATCHED_USNS_FILENAME }}"
+        pattern: ${{ matrix.arch }}-*${{ env.PATCHED_USNS_FILENAME }}
+        merge-multiple: true
 
     # TODO debug code Remove
     - name: Tree
@@ -971,10 +956,6 @@ jobs:
     ## TODO remove below debug step
     - name: treeeee
       run: tree .
-    
-    ## TODO remove below debug step
-    - name: ls directory
-      run: ls -R ./builds
 
     # - name: Run Acceptance Tests
     #   run: ./scripts/test.sh --validate-stack-builds
@@ -1258,6 +1239,7 @@ jobs:
         ## Add the usn files to the assets
         if [ "${{ needs.preparation.outputs.polling_type }}" = "usn" ]; then
           for stack in $stacks; do
+            stack_name=$(echo "$stack" | jq -r '.name')
             stack_name_prefix="${stack}"
             if [[ $stack_name == "default" ]]; then
               stack_name_prefix=""
@@ -1283,7 +1265,8 @@ jobs:
                 --arg usns_filepath "usn-files" \
                 --arg stack_name "${stack_name}" \
                 --arg arch "${arch}" \
-                --arg usn_asset_name "${usn_asset_name}"
+                --arg usn_asset_name "${usn_asset_name}" \
+                --arg patched_usns_suffix "${{ env.PATCHED_USNS_FILENAME }}" \
                 '. += [
                 {
                   "path": ($usns_filepath + "/" + $arch + "-" + $stack_name + "-" + $patched_usns_suffix),
