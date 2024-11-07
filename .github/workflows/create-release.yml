@@ -160,11 +160,9 @@ jobs:
 
           default_stack_dir=$(echo '${{ steps.get-stacks.outputs.stacks }}' | jq -r '.[] | select(.name=="default") | .config_dir')
           echo "default_stack_dir=${default_stack_dir}" >> "$GITHUB_OUTPUT"
-          echo $default_stack_dir
 
           platforms="$(cat "$default_stack_dir/stack.toml" | ./yj -tj | jq -c '[.platforms[] | sub("linux/"; "")]')"
           echo "platforms=${platforms}" >> "$GITHUB_OUTPUT"
-          echo "platforms=${platforms}"
 
           # get previous platforms
           git show $(git describe --tags --abbrev=0):"$default_stack_dir/stack.toml" > ./previous_stack.toml
@@ -174,7 +172,6 @@ jobs:
 
           platforms_added=$(echo -n "{\"current_platforms\":${platforms},\"previous_platforms\":${previous_platforms}}" | jq -c '.current_platforms - .previous_platforms')
           echo "platforms_added=${platforms_added}"  >> "$GITHUB_OUTPUT"
-          echo "platforms_added=${platforms_added}"
 
   # hello_test:
   #   name: hello test
@@ -247,8 +244,8 @@ jobs:
       if: ${{ steps.previous_build.outputs.output_path != '' && steps.previous_run.outputs.output_path != '' }}
       uses: paketo-buildpacks/github-config/actions/stack/generate-package-list@main
       with:
-        build_receipt: "/github/workspace/${{ matrix.arch }}-previous-build-receipt-${{ matrix.stacks.name }}"
-        run_receipt: /github/workspace/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}"
+        build_receipt: /github/workspace/${{ matrix.arch }}-previous-build-receipt-${{ matrix.stacks.name }}
+        run_receipt: /github/workspace/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}
 
     - name: Generate USNs download asset pattern
       id: usn_download_pattern
