@@ -255,8 +255,8 @@ jobs:
       if: ${{ steps.previous_build.outputs.output_path != '' && steps.previous_run.outputs.output_path != '' }}
       uses: paketo-buildpacks/github-config/actions/stack/generate-package-list@main
       with:
-        build_receipt: /github/workspace/${{ matrix.arch }}-previous-build-receipt-${{ matrix.stacks.name }}
-        run_receipt: /github/workspace/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}
+        build_receipt: "${{ github.workspace }}/${{ matrix.arch }}-previous-build-receipt-${{ matrix.stacks.name }}"
+        run_receipt: "${{ github.workspace }}/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}"
 
     - name: Generate USNs download asset pattern
       id: usn_download_pattern
