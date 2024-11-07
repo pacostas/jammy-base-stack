@@ -59,6 +59,14 @@ jobs:
             }]' ${{ env.STACKS_FILEPATH }} )
 
             stack_files_dir="$(dirname "${{ env.STACKS_FILEPATH }}")"
+
+            git show $(git describe --tags --abbrev=0):"${{ env.STACKS_FILEPATH }}" > ./previous_images.json
+
+            if [ -f "./previous_images.json" ]; then
+              previous_stack_names=$(jq  '[.images[] | .name ]' ./previous_images.json )
+            else
+              previous_stack_names="[]"
+            fi
           else
             stacks=$(
             cat <<EOF
@@ -77,6 +85,7 @@ jobs:
           EOF
           )
             stack_files_dir="stack"
+            previous_stack_names="[ \"default\" ]"
           fi
 
           ## Filtering stacks array to include the minimum number of attributes
@@ -96,16 +105,7 @@ jobs:
           stacks=$(jq -c <<< "$stacks" )
           printf "stacks=%s\n" "${stacks}" >> "$GITHUB_OUTPUT"
 
-          git show $(git describe --tags --abbrev=0):"${{ env.STACKS_FILEPATH }}" > ./previous_images.json
-
-          if [ -f ./previous_images.json ]; then
-            previous_stack_names=$(jq  '[.images[] | .name ]' ./previous_images.json )
-          else
-            previous_stack_names="[]"
-          fi
-
-          current_stack_names=$(jq '[.images[] | .name]' "${{ env.STACKS_FILEPATH }}")
-
+          current_stack_names=$(jq '[.[] | .name]' <<< "$stacks")
           stacks_added=$(echo -n "{\"current_stacks\":${current_stack_names},\"previous_stacks\":${previous_stack_names}}" | jq -c '.current_stacks - .previous_stacks')
           echo "stacks_added=${stacks_added}"  >> "$GITHUB_OUTPUT"
 
