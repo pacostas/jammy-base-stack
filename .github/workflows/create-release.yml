@@ -239,6 +239,12 @@ jobs:
         output_path: "/github/workspace/${{ matrix.arch }}-previous-run-receipt-${{ matrix.stacks.name }}"
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
+    - name: tree
+      run: |
+        tree .
+        echo "----------"
+        echo "**************"
+
     - name: Get Package List
       id: packages
       if: ${{ steps.previous_build.outputs.output_path != '' && steps.previous_run.outputs.output_path != '' }}
