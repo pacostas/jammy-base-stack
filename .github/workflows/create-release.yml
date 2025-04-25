@@ -342,7 +342,7 @@ jobs:
 
     - name: Get New USNs
       id: usns
-      uses: paketo-buildpacks/github-config/actions/stack/get-usns@main
+      uses: pacostas/github-config/actions/stack/get-usns@last-usns-filepath
       with:
         distribution: ${{ needs.preparation.outputs.os_codename }}
         packages_filepath: "./${{ matrix.arch.name }}-package-list-${{ matrix.stacks.name }}"
