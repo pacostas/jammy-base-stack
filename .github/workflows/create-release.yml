@@ -340,20 +340,13 @@ jobs:
         output_path: "/github/workspace/${{ matrix.arch.name }}-${{ matrix.stacks.name }}-${{ env.PATCHED_USNS_FILENAME }}-previous"
         token: ${{ secrets.PAKETO_BOT_GITHUB_TOKEN }}
 
-    - name: Output Patched USNs as JSON String
-      id: patched
-      if: ${{ steps.download_patched.outputs.output_path != '' }}
-      run: |
-        patched=$(jq --compact-output . < "./${{ matrix.arch.name }}-${{ matrix.stacks.name }}-${{ env.PATCHED_USNS_FILENAME }}-previous")
-        printf "patched=%s\n" "${patched}" >> "$GITHUB_OUTPUT"
-
     - name: Get New USNs
       id: usns
       uses: paketo-buildpacks/github-config/actions/stack/get-usns@main
       with:
         distribution: ${{ needs.preparation.outputs.os_codename }}
         packages_filepath: "./${{ matrix.arch.name }}-package-list-${{ matrix.stacks.name }}"
-        last_usns: ${{ steps.patched.outputs.patched }}
+        last_usns_filepath: "./${{ matrix.arch.name }}-${{ matrix.stacks.name }}-${{ env.PATCHED_USNS_FILENAME }}-previous"
         usns_output_path: "./${{ matrix.arch.name }}-${{ matrix.stacks.name }}-${{ env.PATCHED_USNS_FILENAME }}"
 
     - name: Upload USNs file
